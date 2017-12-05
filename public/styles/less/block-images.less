@@ -1,0 +1,28 @@
+.block-images{
+    width:100%;
+    overflow:auto;
+    font-family: "Source Sans Pro", Helvetica, sans-serif;
+    &.image-right{
+        .image-block{float:right;}
+        .text-block{float:left;}
+    }
+    &.image-left{
+        .image-block{float:left;}
+        .text-block{float:right;}
+    }
+    > div:not(.hide-on-mobile){
+        width:50%;
+        height:400px;
+    }
+    .image-block{
+        width:50%;
+        height:400px;
+        .anime();
+        &:hover{
+            background-position: 50% 70%;
+        }
+    }
+    .text-block{
+        padding:3em;
+    }
+}
