@@ -141,6 +141,8 @@
       };
       /* init - you can init any event */
       throttle("resize", "optimizedResize");
+
+      
     }
     function setResizeEvent(){
       window.addEventListener("optimizedResize", function() {
@@ -153,10 +155,16 @@
       });
     }
     function eventListeners(){
-      var modalLinks = document.getElementsByClassName("modalLinks");
-      modalLinks.addEventListener("click",openModal);
+      var modalLinks = document.getElementsByClassName("modal-links");
+      
+      for(var i=0;i<modalLinks.length;i++){
+        modalLinks[i].addEventListener("click",openModal);
+      }
+
     }
-    function openModal(){
+    function openModal(e){
+      e.preventDefault();
+      var el = this;
       var modal = document.getElementById("infos-modal");
       modal.className += " open";
     }
