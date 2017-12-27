@@ -6,6 +6,7 @@
     setResizeEvent();
     initParticle();
     eventListeners();
+    initShuffle();
 
     function setSizes(){
         var particle = document.getElementById("particleJS");
@@ -141,6 +142,8 @@
       };
       /* init - you can init any event */
       throttle("resize", "optimizedResize");
+
+      
     }
     function setResizeEvent(){
       window.addEventListener("optimizedResize", function() {
@@ -153,15 +156,56 @@
       });
     }
     function eventListeners(){
-      var modalLinks = document.getElementsByClassName("modalLinks");
-      modalLinks.addEventListener("click",openModal);
+      var modalLinks = document.getElementsByClassName("modal-links");
+      
+      for(var i=0;i<modalLinks.length;i++){
+        modalLinks[i].addEventListener("click",openModal);
+      }
+
     }
-    function openModal(){
+    function openModal(e){
+      e.preventDefault();
+      var el = this;
       var modal = document.getElementById("infos-modal");
       modal.className += " open";
     }
     function closeModal(){
       var modal = document.getElementById("infos-modal");
       modal.className = modal.className.replace(/\bopen\b/,'');
+    }
+    function initShuffle(){
+      var Shuffle = window.Shuffle;
+      var element = document.querySelector('.shuffle-tomes');
+      var sizer = element.querySelector('.shuffle-tomes li:first-child');
+      var filterLinks = document.getElementsByClassName("filter-links");
+      var filters = [];     
+      var shuffleInstance = new Shuffle(element, {
+        itemSelector: '.shuffle-tomes li'
+      });
+  
+      function applyFilters(filters){
+        shuffleInstance.filter(filters);
+      }
+
+      for(var i=0;i<filterLinks.length;i++){
+        filterLinks[i].addEventListener('click',function(e){
+          e.preventDefault();
+          var filter = this.dataset.filter;
+    
+          if(this.className.indexOf('filtered')>-1){
+            this.className = this.className.replace(/\bfiltered\b/,'');
+          }else{
+            this.className += " filtered";
+          }
+          
+          if(filters.indexOf(filter)>-1){
+            filters.splice(filters.indexOf(filter),1);
+            applyFilters(filters);
+            return
+          }
+          filters.push(filter);
+          applyFilters(filters);
+        });
+      }
     }
 })();

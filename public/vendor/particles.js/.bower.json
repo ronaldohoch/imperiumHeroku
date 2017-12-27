@@ -27,5 +27,6 @@
   },
   "_source": "https://github.com/VincentGarreau/particles.js.git",
   "_target": "^2.0.0",
-  "_originalSource": "particles.js"
+  "_originalSource": "particles.js",
+  "_direct": true
 }
