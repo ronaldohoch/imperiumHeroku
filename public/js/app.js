@@ -1,5 +1,23 @@
 (function(){
     'use strict';
+    
+    var elements = {
+      modal : document.getElementById("infosModal"),
+      body : document.getElementsByTagName("body")[0],
+      modalLinks : document.getElementsByClassName("modal-links")
+    }
+
+    var vm = new Vue({
+      el:'#infosModal',
+      data:{
+        modalTitle:"",
+        modalSubtitle:"",
+        modalText:""
+      },
+      methods:{
+        closeModal:closeModal
+      }
+    });
 
     function setSizes(){
         var particle = document.getElementById("particleJS");
@@ -149,29 +167,31 @@
       });
     }
     function eventListeners(){
-      var modalLinks = document.getElementsByClassName("modal-links");
-      
-      for(var i=0;i<modalLinks.length;i++){
-        modalLinks[i].addEventListener("click",function(e){
+      for(var i=0;i<elements.modalLinks.length;i++){
+        elements.modalLinks[i].addEventListener("click",function(e){
           e.preventDefault();
 
           return doRequest(e,this.dataset.text);
         });
       }
-
-      var close = document.getElementById("closeModal");
-      close.addEventListener("click",closeModal);
-
     }
-    function openModal(){
-      var el = this;
+    function openModal(obj){
       var modal = document.getElementById("infosModal");
       modal.className += " open";
+
+      elements.body.className += " modal-open";
+
+      vm.modalTitle = obj.title,
+      vm.modalSubtitle = obj.subtitle,
+      vm.modalText = obj.text
+      
     }
     function closeModal(e){
       e.preventDefault();
       var modal = document.getElementById("infosModal");
       modal.className = modal.className.replace(/\bopen\b/,'');
+
+      elements.body.className = elements.body.className.replace(/\bmodal-open\b/,'');
     }
     function initShuffle(){
       var Shuffle = window.Shuffle;
@@ -208,7 +228,6 @@
         });
       }
     }
-
     function doRequest(e,endpoint){
       e.preventDefault();
       axios({
@@ -217,8 +236,7 @@
         url:'/textos/'+endpoint
       })
         .then(function (response) {
-          console.log(response);
-          openModal()
+          openModal(response.data)
         })
         .catch(function (error) {
           console.log(error);
