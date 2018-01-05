@@ -1,11 +1,28 @@
 (function(){
     'use strict';
+    
+    var elements = {
+      modal : document.getElementById("infosModal"),
+      body : document.getElementsByTagName("body")[0],
+      modalLinks : document.getElementsByClassName("modal-links")
+    }
 
-    customEvents();
-    setSizes();
-    setResizeEvent();
-    initParticle();
-    eventListeners();
+    var vm = new Vue({
+      el:'#infosModal',
+      data:{
+        modalTitle:"",
+        modalSubtitle:"",
+        modalText:""
+      },
+      methods:{
+        closeModal:closeModal,
+        closeModalByOverlay:function(e){
+          if(e.target.id==="infosModal"){
+            closeModal();
+          }
+        }
+      }
+    });
 
     function setSizes(){
         var particle = document.getElementById("particleJS");
@@ -155,21 +172,99 @@
       });
     }
     function eventListeners(){
-      var modalLinks = document.getElementsByClassName("modal-links");
-      
-      for(var i=0;i<modalLinks.length;i++){
-        modalLinks[i].addEventListener("click",openModal);
+      for(var i=0;i<elements.modalLinks.length;i++){
+        elements.modalLinks[i].addEventListener("click",function(e){
+          e.preventDefault();
+
+          return doRequest(e,this.dataset.text);
+        });
+      }
+    }
+    function openModal(obj){
+      var modal = document.getElementById("infosModal");
+      modal.className += " open";
+
+      elements.body.className += " modal-open";
+
+      vm.modalTitle = obj.title,
+      vm.modalSubtitle = obj.subtitle,
+      vm.modalText = obj.text
+
+      document.onkeydown = function(evt) {
+        evt = evt || window.event;
+        if (evt.keyCode == 27) {
+            closeModal();
+            document.onkeydown = undefined;
+        }
+    };
+    }
+    function closeModal(e){
+      e?e.preventDefault():null;
+      var modal = document.getElementById("infosModal");
+      modal.className = modal.className.replace(/\bopen\b/,'');
+
+      elements.body.className = elements.body.className.replace(/\bmodal-open\b/,'');
+    }
+    function initShuffle(){
+      var Shuffle = window.Shuffle;
+      var element = document.querySelector('.shuffle-tomes');
+      var sizer = element.querySelector('.shuffle-tomes li:first-child');
+      var filterLinks = document.getElementsByClassName("filter-links");
+      var filters = [];     
+      var shuffleInstance = new Shuffle(element, {
+        itemSelector: '.shuffle-tomes li'
+      });
+  
+      function applyFilters(filters){
+        shuffleInstance.filter(filters);
       }
 
+      for(var i=0;i<filterLinks.length;i++){
+        filterLinks[i].addEventListener('click',function(e){
+          e.preventDefault();
+          var filter = this.dataset.filter;
+    
+          if(this.className.indexOf('filtered')>-1){
+            this.className = this.className.replace(/\bfiltered\b/,'');
+          }else{
+            this.className += " filtered";
+          }
+          
+          if(filters.indexOf(filter)>-1){
+            filters.splice(filters.indexOf(filter),1);
+            applyFilters(filters);
+            return
+          }
+          filters.push(filter);
+          applyFilters(filters);
+        });
+      }
     }
-    function openModal(e){
+    function doRequest(e,endpoint){
       e.preventDefault();
-      var el = this;
-      var modal = document.getElementById("infos-modal");
-      modal.className += " open";
+      axios({
+        method:'get',
+        responseType: 'json',
+        url:'/textos/'+endpoint
+      })
+        .then(function (response) {
+          openModal(response.data)
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
-    function closeModal(){
-      var modal = document.getElementById("infos-modal");
-      modal.className = modal.className.replace(/\bopen\b/,'');
+    function loadGoogleMaps(){
+      var url = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3461.3255446076123!2d-51.265616384890045!3d-29.826023681962234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9519612d2deccdcd%3A0x5bd329681dcda587!2sEstrada+Cap%C3%A3o+da+Uni%C3%A3o%2C+70%2C+Nova+Santa+Rita+-+RS%2C+92480-000!5e0!3m2!1spt-BR!2sbr!4v1514919193689';
+      var iframe = document.getElementById("googleMap");
+      iframe.src=url;
     }
+
+    customEvents();
+    setSizes();
+    setResizeEvent();
+    initParticle();
+    eventListeners();
+    initShuffle();
+    loadGoogleMaps();
 })();
